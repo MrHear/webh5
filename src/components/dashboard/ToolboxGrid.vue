@@ -1,48 +1,38 @@
 <template>
   <section id="tools" class="mb-12">
-    <h2 class="text-2xl font-bold cyber-text mb-6">🛠️ 工具箱</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div class="flex items-center gap-3 mb-6">
+      <div class="h-8 w-1 bg-cyber-secondary rounded-full shadow-[0_0_10px_#ff00ff]"></div>
+      <h2 class="text-2xl font-bold cyber-text tracking-wider">工具矩阵 <span class="text-gray-500 text-base font-normal">/ TOOLBOX</span></h2>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       <GlassCard
         v-for="tool in tools"
         :key="tool.id"
         :hoverable="true"
+        class="group relative"
       >
-        <a
-          :href="tool.url"
-          target="_blank"
-          class="block group"
-        >
-          <div class="flex flex-col items-center text-center">
-            <!-- 图标 -->
-            <div 
-              class="text-6xl mb-4 transition-all duration-300 group-hover:scale-110 group-hover:animate-glow"
-              :style="{ filter: `drop-shadow(0 0 10px ${tool.color})` }"
-            >
-              {{ tool.icon }}
-            </div>
-            
-            <!-- 标题 -->
-            <h3 class="text-xl font-bold mb-2 group-hover:text-cyber-primary transition-colors">
-              {{ tool.name }}
-            </h3>
-            
-            <!-- 描述 -->
-            <p class="text-sm text-gray-400 mb-3">
-              {{ tool.description }}
-            </p>
-            
-            <!-- 分类标签 -->
-            <span 
-              class="text-xs px-3 py-1 rounded-full"
-              :style="{ 
-                backgroundColor: tool.color + '20', 
-                color: tool.color,
-                border: `1px solid ${tool.color}40`
-              }"
-            >
-              {{ tool.category }}
-            </span>
+        <a :href="tool.url" target="_blank" class="flex items-center gap-4 p-2">
+          <!-- 图标容器 -->
+          <div 
+            class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl transition-all duration-300 group-hover:scale-110 group-hover:shadow-[0_0_15px_currentColor]"
+            :style="{ 
+              backgroundColor: tool.color + '15', 
+              color: tool.color,
+              border: `1px solid ${tool.color}30`
+            }"
+          >
+            <i :class="['ph', tool.icon]"></i>
           </div>
+          
+          <!-- 文字信息 -->
+          <div class="flex-1 min-w-0">
+            <h3 class="font-bold text-white group-hover:text-cyber-primary transition-colors truncate">{{ tool.name }}</h3>
+            <p class="text-xs text-gray-500 truncate">{{ tool.description }}</p>
+          </div>
+
+          <!-- 箭头 -->
+          <i class="ph ph-arrow-up-right text-gray-600 group-hover:text-white transition-colors"></i>
         </a>
       </GlassCard>
     </div>
@@ -54,13 +44,13 @@ import { ref } from 'vue'
 import GlassCard from '../common/GlassCard.vue'
 import type { ToolItem } from '@/types'
 
-// Mock 数据
+// 注意：这里把 icon 改成了 class 名
 const tools = ref<ToolItem[]>([
   {
     id: 1,
     name: 'Claude 镜像',
-    description: 'AI 助手对话平台',
-    icon: '🤖',
+    description: '私人 AI 助手',
+    icon: 'ph-robot', // 对应 <i class="ph ph-robot"></i>
     url: 'https://claude.ai',
     category: 'AI',
     color: '#00f0ff'
@@ -68,68 +58,47 @@ const tools = ref<ToolItem[]>([
   {
     id: 2,
     name: 'Web 终端',
-    description: '在线 Shell 终端',
-    icon: '💻',
+    description: 'SSH 远程管理',
+    icon: 'ph-terminal-window',
     url: '#',
-    category: '开发',
+    category: 'Dev',
     color: '#ff00ff'
   },
   {
     id: 3,
-    name: '云盘入口',
-    description: '个人文件存储',
-    icon: '☁️',
+    name: '文件传输',
+    description: '私有云盘入口',
+    icon: 'ph-cloud-arrow-up',
     url: '#',
-    category: '存储',
+    category: 'Storage',
     color: '#ffff00'
   },
   {
     id: 4,
     name: '代码仓库',
-    description: 'GitHub / GitLab',
-    icon: '📦',
+    description: 'GitLab / Gitea',
+    icon: 'ph-git-branch',
     url: '#',
-    category: '开发',
+    category: 'Code',
     color: '#00ff88'
   },
   {
     id: 5,
-    name: '监控面板',
-    description: '服务器实时监控',
-    icon: '📊',
+    name: '数据库管理',
+    description: 'Adminer / SQL',
+    icon: 'ph-database',
     url: '#',
-    category: '运维',
-    color: '#ff6600'
+    category: 'DB',
+    color: '#00ccff'
   },
   {
     id: 6,
-    name: '文档中心',
-    description: '技术文档与笔记',
-    icon: '📚',
+    name: 'Docker 面板',
+    description: 'Portainer',
+    icon: 'ph-container', // 这是一个假设的图标，phosphor 里可以用 ph-package 代替
     url: '#',
-    category: '知识',
-    color: '#9900ff'
-  },
-  {
-    id: 7,
-    name: 'API 测试',
-    description: 'Postman / Swagger',
-    icon: '🔌',
-    url: '#',
-    category: '开发',
-    color: '#ff0066'
-  },
-  {
-    id: 8,
-    name: '数据库管理',
-    description: 'MySQL / MongoDB',
-    icon: '🗄️',
-    url: '#',
-    category: '数据库',
-    color: '#00ccff'
+    category: 'Ops',
+    color: '#ff6600'
   }
 ])
 </script>
-
-<style scoped>
-</style>
