@@ -1,125 +1,139 @@
 @import "tailwindcss";
 
-@theme {
-  --color-cyber-primary: #00f0ff;
-  --color-cyber-secondary: #9d00ff; /* 调整为稍微亮一点的紫色 */
-  --color-cyber-accent: #ff0066;
-  --color-cyber-dark: #1e1e2e;      /* 基础底色提亮，偏深蓝灰 */
-}
-
 @layer base {
   body {
-    /* 基础底色：深蓝夜空，而不是纯黑 */
-    background-color: #0f1016;
-    color: white;
+    /* 基础背景色，作为气泡的画布 */
+    @apply bg-[#f8f9fa] text-gray-800 transition-colors duration-300 relative overflow-x-hidden;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    overflow-x: hidden;
-    min-height: 100vh;
-    position: relative;
   }
 
-  /* --- 动态背景光斑特效 Start --- */
-  
-  /* 创建两个巨大的模糊光斑 */
-  body::before,
-  body::after {
-    content: '';
-    position: fixed;
-    width: 100vw;
-    height: 100vw;
-    border-radius: 50%;
-    filter: blur(80px); /* 极度模糊，形成柔和光晕 */
-    opacity: 0.3;       /* 控制亮度，不要太刺眼 */
-    z-index: -2;
-    animation: bg-float 20s infinite alternate ease-in-out;
-    pointer-events: none;
+  html.dark body {
+    @apply bg-[#050505] text-gray-200; /* 深色模式背景更加深邃 */
   }
-
-  /* 光斑 1：青色极光 (左上) */
-  body::before {
-    background: radial-gradient(circle, rgba(0, 240, 255, 0.4), transparent 70%);
-    top: -30%;
-    left: -20%;
-    animation-delay: -5s;
-  }
-
-  /* 光斑 2：紫色星云 (右下) */
-  body::after {
-    background: radial-gradient(circle, rgba(157, 0, 255, 0.3), transparent 70%);
-    bottom: -30%;
-    right: -20%;
-  }
-
-  /* 让光斑缓慢浮动的动画 */
-  @keyframes bg-float {
-    0% { transform: translate(0, 0) scale(1); }
-    33% { transform: translate(50px, 30px) scale(1.1); }
-    66% { transform: translate(-30px, 50px) scale(0.9); }
-    100% { transform: translate(0, 0) scale(1); }
-  }
-  
-  /* --- 动态背景光斑特效 End --- */
 }
 
-@layer components {
-  /* 玻璃拟态调整：适应亮背景，增加一点白色底 */
-  .glass-panel {
-    @apply relative;
-    background: rgba(30, 30, 45, 0.4); /* 稍微亮一点的底色 */
-    backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
-    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-  }
+.font-serif {
+  font-family: 'Noto Serif SC', 'Songti SC', serif;
+}
 
-  .glass-panel:hover {
-    background: rgba(40, 40, 60, 0.5);
-    border-color: rgba(255, 255, 255, 0.2);
-    transform: translateY(-4px);
-    box-shadow: 0 15px 45px 0 rgba(0, 0, 0, 0.3), 
-                0 0 20px rgba(0, 240, 255, 0.15);
-  }
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
 
-  /* 输入框优化 */
-  .glass-input {
-    background: rgba(20, 20, 30, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(12px);
-    color: white;
-    transition: all 0.3s ease;
-  }
-  
-  .glass-input:focus {
-    background: rgba(20, 20, 30, 0.5);
-    border-color: var(--color-cyber-primary);
-    box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
-    outline: none;
-  }
+/* --- 背景气泡动画 (Bubble Bounce v2 - 增强版) --- */
 
-  /* 霓虹文字 - 增加一点白色让它更亮 */
-  .cyber-text {
-    @apply text-transparent bg-clip-text bg-gradient-to-r from-cyber-primary via-white to-cyber-secondary;
-    background-size: 200% auto;
-    animation: text-shimmer 5s linear infinite;
-    filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.4));
+/* 1. 噪点纹理层 (Noise Texture) - 增加质感的关键 */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 1; /* 在气泡之上，内容之下 */
+  opacity: 0.04; /* 淡淡的噪点 */
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+html.dark body::before {
+  opacity: 0.06;
+}
+
+/* 2. 气泡容器 - 放置在最底层 */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  /* 使用 background-image 绘制多个渐变气泡，性能更好且不会被层级遮挡 */
+  background: 
+    radial-gradient(circle at 15% 50%, rgba(136, 255, 182, 0.4), transparent 25%),
+    radial-gradient(circle at 85% 30%, rgba(186, 175, 255, 0.4), transparent 25%),
+    radial-gradient(circle at 50% 80%, rgba(144, 224, 255, 0.4), transparent 25%);
+  filter: blur(60px); /* 整体模糊，融合色彩 */
+  animation: gradient-move 15s ease-in-out infinite alternate;
+  background-size: 140% 140%; /* 放大背景以允许移动 */
+}
+
+html.dark body::after {
+  background: 
+    radial-gradient(circle at 15% 50%, rgba(16, 185, 129, 0.25), transparent 30%),
+    radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.25), transparent 30%),
+    radial-gradient(circle at 50% 80%, rgba(59, 130, 246, 0.25), transparent 30%);
+}
+
+/* 让背景渐变整体缓慢移动，模拟流动的气泡感 */
+@keyframes gradient-move {
+  0% {
+    background-position: 0% 50%;
+    transform: scale(1);
   }
-  
-  @keyframes text-shimmer {
-    to { background-position: 200% center; }
+  50% {
+    background-position: 100% 50%;
+    transform: scale(1.1); /* 微微放大，模拟呼吸 */
   }
-  
-  /* 滚动条 */
-  ::-webkit-scrollbar {
-    width: 6px;
+  100% {
+    background-position: 0% 50%;
+    transform: scale(1);
   }
-  ::-webkit-scrollbar-track {
-    background: transparent;
+}
+
+/* --- ✨ 光标与花朵特效 --- */
+
+/* 1. 主光标已移除 */
+.cursor-main {
+  display: none;
+}
+
+/* 2. 花朵拖尾粒子 */
+.flower-trail {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  animation: float-away 1.5s ease-out forwards; /* 稍微延长飘动时间 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px; 
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); /* 给花朵加一点投影，增加立体感 */
+}
+
+@keyframes float-away {
+  0% {
+    transform: translate(-50%, -50%) scale(0.2) rotate(0deg);
+    opacity: 0;
   }
-  ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.15);
-    border-radius: 3px;
+  10% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1) rotate(10deg);
   }
-  ::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.3);
+  100% {
+    transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(0.8) rotate(var(--rot));
+    opacity: 0;
+  }
+}
+
+/* 点击时的爆炸粒子 */
+.click-particle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  animation: particle-explode 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  box-shadow: 0 0 4px rgba(0,0,0,0.1);
+}
+
+@keyframes particle-explode {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(0);
+    opacity: 0;
   }
 }
