@@ -2,107 +2,124 @@
 
 @theme {
   --color-cyber-primary: #00f0ff;
-  --color-cyber-secondary: #ff00ff;
-  --color-cyber-accent: #ffff00;
-  --color-cyber-dark: #0a0a0f;
-  --color-cyber-darker: #050508;
+  --color-cyber-secondary: #9d00ff; /* 调整为稍微亮一点的紫色 */
+  --color-cyber-accent: #ff0066;
+  --color-cyber-dark: #1e1e2e;      /* 基础底色提亮，偏深蓝灰 */
 }
 
 @layer base {
   body {
-    @apply bg-cyber-darker text-white;
-    font-family: 'Courier New', monospace;
+    /* 基础底色：深蓝夜空，而不是纯黑 */
+    background-color: #0f1016;
+    color: white;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    overflow-x: hidden;
+    min-height: 100vh;
+    position: relative;
   }
+
+  /* --- 动态背景光斑特效 Start --- */
+  
+  /* 创建两个巨大的模糊光斑 */
+  body::before,
+  body::after {
+    content: '';
+    position: fixed;
+    width: 100vw;
+    height: 100vw;
+    border-radius: 50%;
+    filter: blur(80px); /* 极度模糊，形成柔和光晕 */
+    opacity: 0.3;       /* 控制亮度，不要太刺眼 */
+    z-index: -2;
+    animation: bg-float 20s infinite alternate ease-in-out;
+    pointer-events: none;
+  }
+
+  /* 光斑 1：青色极光 (左上) */
+  body::before {
+    background: radial-gradient(circle, rgba(0, 240, 255, 0.4), transparent 70%);
+    top: -30%;
+    left: -20%;
+    animation-delay: -5s;
+  }
+
+  /* 光斑 2：紫色星云 (右下) */
+  body::after {
+    background: radial-gradient(circle, rgba(157, 0, 255, 0.3), transparent 70%);
+    bottom: -30%;
+    right: -20%;
+  }
+
+  /* 让光斑缓慢浮动的动画 */
+  @keyframes bg-float {
+    0% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(50px, 30px) scale(1.1); }
+    66% { transform: translate(-30px, 50px) scale(0.9); }
+    100% { transform: translate(0, 0) scale(1); }
+  }
+  
+  /* --- 动态背景光斑特效 End --- */
 }
 
 @layer components {
-  /* 玻璃拟态面板 */
+  /* 玻璃拟态调整：适应亮背景，增加一点白色底 */
   .glass-panel {
     @apply relative;
-    background: rgba(10, 10, 15, 0.6);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(0, 240, 255, 0.2);
-    box-shadow: 0 4px 30px rgba(0, 240, 255, 0.1),
-                inset 0 1px 1px rgba(255, 255, 255, 0.1);
-    transition: all 0.3s ease;
+    background: rgba(30, 30, 45, 0.4); /* 稍微亮一点的底色 */
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
   }
 
   .glass-panel:hover {
-    border-color: rgba(0, 240, 255, 0.5);
-    box-shadow: 0 8px 40px rgba(0, 240, 255, 0.2),
-                inset 0 1px 1px rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
+    background: rgba(40, 40, 60, 0.5);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-4px);
+    box-shadow: 0 15px 45px 0 rgba(0, 0, 0, 0.3), 
+                0 0 20px rgba(0, 240, 255, 0.15);
   }
 
-  /* 赛博朋克发光文字 */
+  /* 输入框优化 */
+  .glass-input {
+    background: rgba(20, 20, 30, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px);
+    color: white;
+    transition: all 0.3s ease;
+  }
+  
+  .glass-input:focus {
+    background: rgba(20, 20, 30, 0.5);
+    border-color: var(--color-cyber-primary);
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+    outline: none;
+  }
+
+  /* 霓虹文字 - 增加一点白色让它更亮 */
   .cyber-text {
-    @apply text-cyber-primary;
-    text-shadow: 0 0 10px rgba(0, 240, 255, 0.8),
-                 0 0 20px rgba(0, 240, 255, 0.6),
-                 0 0 30px rgba(0, 240, 255, 0.4);
+    @apply text-transparent bg-clip-text bg-gradient-to-r from-cyber-primary via-white to-cyber-secondary;
+    background-size: 200% auto;
+    animation: text-shimmer 5s linear infinite;
+    filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.4));
   }
-
-  /* 霓虹边框 */
-  .neon-border {
-    border: 2px solid #00f0ff;
-    box-shadow: 0 0 5px #00f0ff,
-                0 0 10px #00f0ff,
-                inset 0 0 5px #00f0ff;
+  
+  @keyframes text-shimmer {
+    to { background-position: 200% center; }
   }
-
-  /* 渐变背景 */
-  .gradient-cyber {
-    background: linear-gradient(135deg, rgba(0, 240, 255, 0.1) 0%, rgba(255, 0, 255, 0.1) 100%);
+  
+  /* 滚动条 */
+  ::-webkit-scrollbar {
+    width: 6px;
   }
-
-  /* 扫描线效果 */
-  .scanline {
-    position: relative;
-    overflow: hidden;
+  ::-webkit-scrollbar-track {
+    background: transparent;
   }
-
-  .scanline::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, #00f0ff, transparent);
-    animation: scan 3s linear infinite;
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 3px;
   }
-
-  @keyframes scan {
-    0% {
-      transform: translateY(0);
-    }
-    100% {
-      transform: translateY(500px);
-    }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
   }
-}
-
-/* 滚动条样式 */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: rgba(10, 10, 15, 0.5);
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(0, 240, 255, 0.3);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 240, 255, 0.5);
-}
-
-/* 选中文本样式 */
-::selection {
-  background: rgba(0, 240, 255, 0.3);
-  color: #fff;
 }
