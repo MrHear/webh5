@@ -1,43 +1,38 @@
-# 第一阶段：构建环境
-# ⚠️ 换用 node:18 (Debian)，放弃 Alpine，解决潜在的二进制依赖问题
-FROM node:18 as build-stage
+# 1. 升级基础镜像：Vite 7+ 和新版 TS 建议使用 Node 20 或 22 (LTS)
+# 使用 alpine 版本体积更小
+FROM node:22-alpine as build-stage
 
-# 设置工作目录
 WORKDIR /app
 
-# 复制 package.json 和 package-lock.json
+# 2. 复制依赖定义
 COPY package*.json ./
 
-# 安装依赖
-# ⚠️ 使用 npm install 而不是 ci，并且不忽略脚本
-# ⚠️ 显式安装 typescript 和 vite，防止因为路径问题找不到
+# 3. 安装依赖
+# npm install 会默认安装 devDependencies (包含 vite, typescript)，这是构建所必需的
+# 不需要额外单独 install vite
 RUN npm install
-RUN npm install -D typescript vite
 
-# 复制源代码
+# 4. 复制源码
 COPY . .
 
-# ------------------------------------------------------------------
-# 构建命令
-# 1. 增加内存限制 (--max-old-space-size=4096)
-# 2. 显式调用 node_modules 里的 vite
-# 3. 加上 --debug 参数，万一失败了方便看日志 (虽然这里看不到)
-# ------------------------------------------------------------------
-ENV NODE_ENV=production
-RUN node --max-old-space-size=4096 ./node_modules/.bin/vite build
+# 5. 设置环境变量和内存限制
+# 使用 NODE_OPTIONS 全局控制内存，比在命令里写更通用
+ENV NODE_OPTIONS="--max-old-space-size=4096"
 
-# 第二阶段：生产环境
-# Nginx 这里可以用 alpine，因为它只负责静态文件，不涉及构建
+# 6. 执行构建
+# 推荐直接使用 package.json 中的 build 脚本，它包含了 vue-tsc 类型检查
+# 如果 "vue-tsc" 报错导致构建失败，且你想忽略类型错误，可以改为: RUN npx vite build
+RUN npm run build
+
+# --- 生产环境阶段 ---
 FROM nginx:alpine as production-stage
 
-# 从第一阶段复制构建好的 dist 目录到 Nginx
+# 复制构建产物
 COPY --from=build-stage /app/dist /usr/share/nginx/html
 
-# 复制自定义的 Nginx 配置
+# 复制 Nginx 配置
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# 暴露 80 端口
 EXPOSE 80
 
-# 启动 Nginx
 CMD ["nginx", "-g", "daemon off;"]
