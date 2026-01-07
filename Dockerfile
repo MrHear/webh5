@@ -6,16 +6,18 @@ WORKDIR /app
 
 # 复制 package.json 并安装依赖
 COPY package*.json ./
-# ⚠️ 移除 --ignore-scripts，因为 vite 依赖 esbuild，它需要运行 postinstall 脚本来下载二进制文件
-# 使用 npm ci 保证依赖版本一致性
+
+# ⚠️ 关键修正：
+# 1. 移除 --ignore-scripts：必须允许运行 postinstall 脚本，否则 esbuild (vite 的依赖) 不会下载二进制文件，导致构建失败。
+# 2. 使用 npm install 而不是 ci，虽然 ci 更快，但在某些缓存场景下 install 更稳健。
 RUN npm install
 
 # 复制源代码
 COPY . .
 
 # ------------------------------------------------------------------
-# 直接调用 npx vite build 进行构建
-# 这将绕过 package.json 中定义的 "build" (包含 vue-tsc)，只进行转译
+# 构建命令
+# 直接调用 npx vite build，绕过 package.json 中的 vue-tsc 类型检查
 # ------------------------------------------------------------------
 RUN npx vite build
 
