@@ -8,8 +8,9 @@ WORKDIR /app
 COPY package*.json ./
 
 # ⚠️ 关键修正：
-# 1. 移除 --ignore-scripts：必须允许运行 postinstall 脚本，否则 esbuild (vite 的依赖) 不会下载二进制文件，导致构建失败。
-# 2. 使用 npm install 而不是 ci，虽然 ci 更快，但在某些缓存场景下 install 更稳健。
+# 1. 显式设置 NODE_ENV 为 development 以确保安装 devDependencies (包括 vite)
+# 2. 使用 npm install 确保依赖安装完整
+ENV NODE_ENV=development
 RUN npm install
 
 # 复制源代码
