@@ -2,12 +2,12 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import Particles from '@tsparticles/vue3'
 import { loadSlim } from '@tsparticles/slim'
-// 引入图标库
-import '@phosphor-icons/web/regular' 
+// 引入图标库样式
+// @ts-ignore
+import '@phosphor-icons/web/regular'
 
 import App from './App.vue'
 import router from './router'
-// ✅ 正确引入全局样式
 import './assets/main.css'
 
 const app = createApp(App)

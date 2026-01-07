@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref } from 'vue'
 
 // 坐标状态
 const effectsContainer = ref<HTMLElement | null>(null)
@@ -52,7 +52,7 @@ const createFlowerTrail = (x: number, y: number) => {
   flower.classList.add('flower-trail')
   
   // 随机选一个花
-  flower.innerText = flowers[Math.floor(Math.random() * flowers.length)]
+  flower.innerText = flowers[Math.floor(Math.random() * flowers.length)]!
   
   // 设置初始位置
   flower.style.left = `${x}px`
@@ -85,7 +85,7 @@ const createClickEffect = (x: number, y: number) => {
   for (let i = 0; i < particleCount; i++) {
     const particle = document.createElement('div')
     particle.classList.add('click-particle')
-    particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)]
+    particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)]!
     particle.style.left = `${x}px`
     particle.style.top = `${y}px`
     

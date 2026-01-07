@@ -93,8 +93,8 @@ const adjectives = ['迷路的', '失眠的', '快乐的', '忧郁的', '飞翔�
 const nouns = ['诗人', '宇航员', '猫', '仙人掌', '信差', '过客', '鲸鱼']
 
 const regenerateIdentity = () => {
-  const adj = adjectives[Math.floor(Math.random() * adjectives.length)]
-  const noun = nouns[Math.floor(Math.random() * nouns.length)]
+  const adj = adjectives[Math.floor(Math.random() * adjectives.length)]!
+  const noun = nouns[Math.floor(Math.random() * nouns.length)]!
   currentIdentity.value = adj + noun
 }
 </script>
