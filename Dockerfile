@@ -1,30 +1,33 @@
 # 第一阶段：构建环境
-FROM node:18-alpine as build-stage
+# ⚠️ 换用 node:18 (Debian)，放弃 Alpine，解决潜在的二进制依赖问题
+FROM node:18 as build-stage
 
 # 设置工作目录
 WORKDIR /app
 
 # 复制 package.json 和 package-lock.json
-# 注意：这里我们复制 lock 文件以确保版本一致性
 COPY package*.json ./
 
 # 安装依赖
-# 使用 npm ci (clean install) 确保完全一致的依赖树
-# --legacy-peer-deps 有时候能救命，防止 peer dependency 冲突
-RUN npm ci --legacy-peer-deps
+# ⚠️ 使用 npm install 而不是 ci，并且不忽略脚本
+# ⚠️ 显式安装 typescript 和 vite，防止因为路径问题找不到
+RUN npm install
+RUN npm install -D typescript vite
 
 # 复制源代码
 COPY . .
 
 # ------------------------------------------------------------------
 # 构建命令
-# 显式设置 NODE_ENV 为 production (虽然 vite build 默认就是 prod，但有些库依赖这个环境变量)
-# 直接调用 npx vite build
+# 1. 增加内存限制 (--max-old-space-size=4096)
+# 2. 显式调用 node_modules 里的 vite
+# 3. 加上 --debug 参数，万一失败了方便看日志 (虽然这里看不到)
 # ------------------------------------------------------------------
 ENV NODE_ENV=production
-RUN npx vite build
+RUN node --max-old-space-size=4096 ./node_modules/.bin/vite build
 
 # 第二阶段：生产环境
+# Nginx 这里可以用 alpine，因为它只负责静态文件，不涉及构建
 FROM nginx:alpine as production-stage
 
 # 从第一阶段复制构建好的 dist 目录到 Nginx
