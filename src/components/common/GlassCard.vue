@@ -1,7 +1,10 @@
 <template>
   <div 
-    class="glass-panel rounded-lg p-6"
-    :class="{ 'cursor-pointer': hoverable }"
+    class="relative bg-white dark:bg-[#1a1a1c] rounded-xl border border-gray-100 dark:border-white/5 p-6 transition-all duration-300"
+    :class="{ 
+      'cursor-pointer hover:shadow-md hover:border-indigo-100/50 dark:hover:border-white/10': hoverable,
+      'shadow-[0_2px_8px_rgba(0,0,0,0.02)]': true
+    }"
   >
     <slot />
   </div>
@@ -16,7 +19,3 @@ withDefaults(defineProps<Props>(), {
   hoverable: false
 })
 </script>
-
-<style scoped>
-/* 额外的玻璃卡片样式 */
-</style>

@@ -1,118 +1,85 @@
 <template>
-  <div class="h-full p-6 text-gray-800 dark:text-white overflow-y-auto">
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+  <div class="flex flex-col gap-10">
+    
+    <!-- 头部：极简的输入引导 -->
+    <header class="flex flex-col items-start gap-6 py-8">
+      <div class="w-full max-w-2xl">
+        <h2 class="text-3xl font-light text-slate-800 dark:text-slate-100 mb-2 font-serif">
+          想法，<span class="italic text-slate-400">稍纵即逝。</span>
+        </h2>
+      </div>
       
-      <!-- 区域 A: 状态面板 -->
-      <section class="lg:col-span-2">
-        <GlassCard class="h-full flex flex-col justify-between min-h-[200px] relative overflow-hidden group border border-gray-200 dark:border-white/5 bg-white/50 dark:bg-black/40">
-          <div class="absolute inset-0 bg-gradient-to-r from-emerald-900/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
-          
-          <div class="relative z-10">
-            <h2 class="text-3xl font-bold mb-2 glitch-text">欢迎归来，指挥官。</h2>
-            <p class="text-gray-500 dark:text-gray-400 font-mono text-sm">系统状态: 运行正常</p>
-          </div>
-
-          <div class="mt-8 relative z-10">
-            <div class="flex justify-between text-xs font-mono text-emerald-600 dark:text-emerald-400 mb-2">
-              <span>博客系统内核</span>
-              <span>85%</span>
-            </div>
-            <div class="h-2 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
-              <div class="h-full bg-emerald-500 w-[85%] shadow-[0_0_10px_rgba(16,185,129,0.5)] relative">
-                <div class="absolute inset-0 bg-white/20 animate-pulse"></div>
-              </div>
-            </div>
-          </div>
-        </GlassCard>
-      </section>
-
-      <!-- 区域 B: 快捷入口 -->
-      <section class="lg:col-span-1 grid grid-rows-2 gap-6">
-        <GlassCard 
-          hoverable 
-          class="flex items-center justify-between group border border-gray-200 dark:border-white/5 bg-white/50 dark:bg-black/40 cursor-pointer"
-          @click="router.push('/editor')"
-        >
-          <div>
-            <div class="text-xl font-bold text-gray-900 dark:text-white group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition-colors">新建信号</div>
-            <div class="text-xs text-gray-500 font-mono mt-1">创建条目()</div>
-          </div>
-          <i class="ph ph-pen-nib text-3xl text-gray-400 dark:text-gray-600 group-hover:text-emerald-500 transition-colors"></i>
-        </GlassCard>
-
-        <GlassCard class="flex items-center justify-between opacity-50 cursor-not-allowed grayscale border border-gray-200 dark:border-white/5 bg-white/50 dark:bg-black/40">
-          <div>
-            <div class="text-xl font-bold text-gray-900 dark:text-white">实验室</div>
-            <div class="text-xs text-gray-500 font-mono mt-1">访问拒绝</div>
-          </div>
-          <i class="ph ph-flask text-3xl text-gray-400 dark:text-gray-600"></i>
-        </GlassCard>
-      </section>
-
-      <!-- 区域 C: 内容流 -->
-      <section class="lg:col-span-3 mt-4">
-        <div class="flex items-center gap-4 mb-6">
-          <h3 class="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
-            <i class="ph ph-activity text-emerald-500"></i>
-            数据流
-          </h3>
-          <div class="h-px bg-gray-200 dark:bg-gray-800 flex-1"></div>
+      <!-- 快速开始卡片 -->
+      <button 
+        @click="router.push('/editor')"
+        class="group w-full max-w-2xl bg-white dark:bg-[#1a1a1c] border border-gray-100 dark:border-white/5 rounded-xl p-4 shadow-sm hover:shadow-md transition-all text-left flex items-center justify-between"
+      >
+        <span class="text-slate-400 dark:text-slate-500 pl-2">
+          写点什么...
+        </span>
+        <div class="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-400 group-hover:bg-indigo-50 group-hover:text-indigo-500 transition-colors">
+          <i class="ph ph-plus"></i>
         </div>
+      </button>
+    </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <GlassCard 
-            v-for="post in postsStore.posts" 
-            :key="post.id"
-            hoverable
-            class="group h-full flex flex-col border border-gray-200 dark:border-white/5 bg-white/50 dark:bg-black/40 cursor-pointer"
+    <!-- 内容流：时间轴样式 -->
+    <section class="max-w-2xl">
+      <div class="flex items-center justify-between mb-8 pb-2 border-b border-gray-100 dark:border-white/5">
+        <span class="text-xs font-bold tracking-widest text-slate-400 uppercase">Recent</span>
+        <!-- 简单的过滤器 -->
+        <div class="flex gap-4">
+           <button class="text-xs font-medium text-slate-800 dark:text-white">All</button>
+           <button class="text-xs font-medium text-slate-400 hover:text-slate-600">Drafts</button>
+        </div>
+      </div>
+
+      <div class="space-y-6">
+        <div 
+          v-for="post in postsStore.posts" 
+          :key="post.id"
+          class="group relative pl-8 border-l border-gray-100 dark:border-white/5 hover:border-indigo-200 dark:hover:border-indigo-900 transition-colors py-1"
+        >
+          <!-- 时间点装饰 -->
+          <div class="absolute -left-[5px] top-3 w-[9px] h-[9px] rounded-full bg-white dark:bg-[#0f0f11] border-2 border-gray-200 dark:border-gray-700 group-hover:border-indigo-400 transition-colors"></div>
+
+          <div 
+            class="cursor-pointer transition-all duration-300 group-hover:translate-x-1"
             @click="router.push(`/post/${post.id}`)"
           >
-            <div class="flex justify-between items-start mb-4">
-              <span class="text-xs font-mono px-2 py-1 rounded bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
-                {{ post.type === 'markdown' ? '技术' : '随笔' }}
+            <div class="flex items-center gap-3 mb-1">
+              <span class="text-xs font-mono text-slate-400">{{ post.createdAt }}</span>
+              <span 
+                class="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700"
+              ></span>
+              <span class="text-[10px] tracking-wide uppercase text-slate-400 border border-slate-100 dark:border-white/5 px-1.5 py-0.5 rounded">
+                {{ post.type === 'markdown' ? 'MD' : 'RT' }}
               </span>
-              <span class="text-xs font-mono text-gray-500">{{ post.createdAt }}</span>
             </div>
-            
-            <h4 class="text-xl font-bold text-gray-900 dark:text-white mb-2 line-clamp-2 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+
+            <h3 class="text-lg font-medium text-slate-800 dark:text-slate-200 mb-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
               {{ post.title }}
-            </h4>
+            </h3>
             
-            <p class="text-gray-500 dark:text-gray-400 text-sm line-clamp-3 mb-4 flex-1">
+            <p class="text-sm text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed opacity-80 group-hover:opacity-100">
               {{ post.summary }}
             </p>
-
-            <div class="flex gap-2 flex-wrap">
-              <span 
-                v-for="tag in post.tags" 
-                :key="tag"
-                class="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/20 px-1.5 py-0.5 rounded"
-              >
-                #{{ tag }}
-              </span>
-            </div>
-          </GlassCard>
+          </div>
         </div>
-      </section>
-    </div>
+      </div>
+
+      <!-- 如果没有内容 -->
+      <div v-if="postsStore.posts.length === 0" class="py-20 text-center">
+        <p class="text-slate-400 italic font-serif">一片荒原。</p>
+      </div>
+    </section>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { usePostsStore } from '@/stores/posts'
-import GlassCard from '@/components/common/GlassCard.vue'
 
 const router = useRouter()
 const postsStore = usePostsStore()
 </script>
-
-<style scoped>
-.glitch-text {
-  position: relative;
-  /* 仅在深色模式下显示发光 */
-}
-:global(.dark) .glitch-text {
-  text-shadow: 2px 2px 0px rgba(16, 185, 129, 0.2);
-}
-</style>
