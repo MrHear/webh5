@@ -1,90 +1,81 @@
 <template>
   <div :class="{ 'dark': isDarkMode }" class="min-h-screen transition-colors duration-300">
-    <!-- 外层容器：控制整体背景色，设置为相对定位以便容纳绝对定位的背景 -->
-    <div class="relative min-h-screen bg-[#f8f9fa] dark:bg-[#121212] flex flex-col md:flex-row font-sans text-gray-800 dark:text-gray-200 transition-colors duration-300 overflow-hidden">
+    <div class="relative min-h-screen bg-[#f8f9fa] dark:bg-[#050505] flex flex-col md:flex-row font-sans text-gray-800 dark:text-gray-200 transition-colors duration-300 overflow-hidden">
       
-      <!-- ✨ 背景微光特效 (新增) -->
-      <!-- 使用 absolute 定位铺满屏幕，z-0 确保在最底层 -->
+      <!-- 动态星空背景 -->
+      <StarBackground class="absolute inset-0 z-0" />
+
+      <!-- 增强型背景光效 -->
       <div class="absolute inset-0 w-full h-full overflow-hidden z-0 pointer-events-none">
-        <!-- 光斑 1: 左上角，淡青色 -->
-        <div class="absolute top-0 left-0 w-96 h-96 bg-emerald-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob dark:bg-emerald-900 dark:mix-blend-screen dark:opacity-20"></div>
-        <!-- 光斑 2: 右上角，淡紫色 -->
-        <div class="absolute top-0 right-0 w-96 h-96 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000 dark:bg-purple-900 dark:mix-blend-screen dark:opacity-20"></div>
-        <!-- 光斑 3: 底部中间，淡蓝色 -->
-        <div class="absolute -bottom-32 left-20 w-96 h-96 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-4000 dark:bg-blue-900 dark:mix-blend-screen dark:opacity-20"></div>
+        <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-emerald-500/20 rounded-full mix-blend-screen filter blur-[100px] animate-pulse-slow"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-purple-600/20 rounded-full mix-blend-screen filter blur-[100px] animate-pulse-slow animation-delay-2000"></div>
+        <!-- 网格覆盖层 (仅暗色模式可见) -->
+        <div class="absolute inset-0 bg-grid-pattern opacity-[0.03] dark:opacity-[0.07] pointer-events-none"></div>
       </div>
 
-      <!-- 左侧侧边栏 (固定) -->
-      <!-- z-30 确保浮在背景之上 -->
-      <aside class="w-full md:w-72 bg-white/80 dark:bg-[#1e1e1e]/80 backdrop-blur-md border-r border-gray-100 dark:border-gray-800 flex flex-col fixed md:h-screen z-30 shadow-sm md:shadow-none transition-colors duration-300">
-        <!-- 个人信息区 -->
+      <!-- 侧边栏 -->
+      <aside class="w-full md:w-72 bg-white/80 dark:bg-[#121212]/80 backdrop-blur-xl border-r border-gray-100 dark:border-gray-800 flex flex-col fixed md:h-screen z-30 shadow-sm md:shadow-none transition-colors duration-300">
         <div class="p-8 text-center md:text-left">
-          <div class="w-20 h-20 rounded-full bg-gray-200 dark:bg-gray-700 mb-4 mx-auto md:mx-0 overflow-hidden relative group cursor-pointer border-2 border-transparent dark:border-gray-600 transition-colors">
-               <!-- 头像占位 -->
-               <div class="absolute inset-0 bg-gray-300 dark:bg-gray-600 animate-pulse group-hover:bg-gray-400 transition-colors"></div>
-               <i class="ph ph-user absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-3xl text-gray-500 dark:text-gray-400"></i>
+          <div class="w-20 h-20 rounded-full bg-gray-200 dark:bg-gray-800 mb-4 mx-auto md:mx-0 overflow-hidden relative group cursor-pointer border-2 border-transparent dark:border-emerald-500/30 transition-all hover:scale-105 shadow-lg shadow-emerald-500/10">
+            <div class="absolute inset-0 bg-gray-300 dark:bg-gray-700 animate-pulse group-hover:bg-gray-400 transition-colors"></div>
+            <i class="ph ph-user-circle absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-4xl text-gray-500 dark:text-emerald-400"></i>
           </div>
-          <h1 class="text-xl font-bold font-serif text-gray-900 dark:text-white tracking-tight">我的精神角落</h1>
-          <p class="text-xs text-gray-400 mt-2 font-light leading-relaxed">
-            写代码，也写诗。<br>记录生活中的每一个微小瞬间。
+          <h1 class="text-2xl font-bold font-serif text-gray-900 dark:text-white tracking-tight glitch-effect" data-text="BLOG_OS">博客系统</h1>
+          <p class="text-xs text-gray-500 dark:text-emerald-500/80 mt-2 font-mono tracking-widest">
+            SYSTEM_ONLINE<br>V 2.0.77 CN
           </p>
         </div>
 
-        <!-- 导航菜单 -->
-        <nav class="flex-1 px-4 space-y-1">
-          <a 
+        <nav class="flex-1 px-4 space-y-2">
+          <router-link 
             v-for="item in navItems" 
-            :key="item.name"
-            href="#" 
-            class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 group"
-            :class="activeTab === item.id ? 'bg-gray-900 dark:bg-emerald-600 text-white shadow-md' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50/50 dark:hover:bg-gray-800/50 hover:text-gray-900 dark:hover:text-gray-200'"
-            @click.prevent="activeTab = item.id"
+            :key="item.path"
+            :to="item.path"
+            class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 group relative overflow-hidden"
+            active-class="bg-gray-900 dark:bg-emerald-900/30 text-white dark:text-emerald-400 border border-transparent dark:border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.2)]"
+            :class="{ 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-gray-200': $route.path !== item.path }"
           >
-            <i :class="['ph text-lg', item.icon, activeTab === item.id ? 'text-white' : 'text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300']"></i>
-            {{ item.name }}
-          </a>
+            <i :class="['ph text-lg', item.icon, $route.path === item.path ? 'text-white dark:text-emerald-400' : 'text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300']"></i>
+            <span class="relative z-10">{{ item.name }}</span>
+            <!-- 激活时的扫描光效 -->
+            <div v-if="$route.path === item.path" class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] animate-scan"></div>
+          </router-link>
         </nav>
 
-        <!-- 底部版权 -->
-        <div class="p-6 text-xs text-gray-300 dark:text-gray-600 text-center md:text-left">
-          &copy; 2026 Personal Space.
+        <div class="p-6 text-xs text-gray-400 dark:text-gray-600 text-center md:text-left font-mono">
+          &copy; 2077 网络行者
         </div>
       </aside>
 
-      <!-- 右侧主体区域 -->
-      <!-- z-10 确保在背景之上，但在侧边栏之下 -->
+      <!-- 主内容区 -->
       <main class="flex-1 md:ml-72 min-h-screen flex flex-col relative z-10">
         
-        <!-- 顶边栏 (Top Bar) -->
-        <header class="h-16 bg-white/60 dark:bg-[#121212]/60 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 sticky top-0 z-20 px-6 flex items-center justify-between transition-colors duration-300">
-          
-          <!-- 左侧：当前页面标题 -->
+        <!-- 顶部导航栏 -->
+        <header class="h-16 bg-white/60 dark:bg-[#0a0a0a]/60 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 sticky top-0 z-20 px-6 flex items-center justify-between transition-colors duration-300">
           <div class="flex items-center gap-2">
-            <span class="text-gray-400 dark:text-gray-500 text-sm">当前位置 /</span>
-            <span class="text-sm font-bold text-gray-800 dark:text-gray-200">{{ getCurrentPageName }}</span>
+            <span class="text-gray-400 dark:text-gray-500 text-sm font-mono">路径 //</span>
+            <span class="text-sm font-bold text-gray-800 dark:text-emerald-400 font-mono tracking-wider">{{ $route.name?.toString().toUpperCase() }}</span>
           </div>
 
-          <!-- 右侧：功能菜单 -->
-          <div class="flex items-center gap-3">
-            <!-- 主题切换按钮 -->
-            <button 
-              @click="toggleTheme" 
-              class="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors focus:outline-none"
-              :title="isDarkMode ? '切换到日间模式' : '切换到深夜模式'"
-            >
-              <Transition name="rotate" mode="out-in">
-                <i v-if="isDarkMode" class="ph ph-moon-stars text-xl"></i>
-                <i v-else class="ph ph-sun text-xl"></i>
-              </Transition>
-            </button>
+          <div class="flex items-center gap-4">
+            <!-- 高级主题切换器 -->
+            <div class="flex items-center gap-2 bg-gray-100 dark:bg-gray-900 p-1 rounded-full border border-gray-200 dark:border-gray-700">
+              <button 
+                @click="setTheme(false)"
+                class="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300"
+                :class="!isDarkMode ? 'bg-white text-orange-500 shadow-sm' : 'text-gray-400 hover:text-gray-200'"
+              >
+                <i class="ph ph-sun text-lg"></i>
+              </button>
+              <button 
+                @click="setTheme(true)"
+                class="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300"
+                :class="isDarkMode ? 'bg-gray-800 text-emerald-400 shadow-sm' : 'text-gray-400 hover:text-gray-600'"
+              >
+                <i class="ph ph-moon-stars text-lg"></i>
+              </button>
+            </div>
             
-            <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
-
-            <!-- 通知/设置 -->
-            <button class="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-              <i class="ph ph-bell text-xl"></i>
-            </button>
-
              <!-- 移动端菜单按钮 -->
              <button class="md:hidden ml-2 text-gray-500 dark:text-gray-400" @click="toggleSidebar">
                 <i class="ph ph-list text-2xl"></i>
@@ -92,48 +83,37 @@
           </div>
         </header>
 
-        <!-- 内容滚动区 -->
-        <!-- 移除背景色，让 body 的背景光斑透出来 -->
-        <div class="flex-1 max-w-4xl w-full mx-auto px-6 py-12 relative">
-          <Transition name="fade" mode="out-in">
-            <component :is="activeComponent" />
-          </Transition>
+        <!-- 路由视图 -->
+        <div class="flex-1 w-full mx-auto relative overflow-hidden">
+          <router-view v-slot="{ Component }">
+            <Transition name="fade" mode="out-in">
+              <component :is="Component" />
+            </Transition>
+          </router-view>
         </div>
       </main>
-
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import JournalList from '@/components/feature/JournalList.vue'
-import TreeHolePanel from '@/components/feature/TreeHolePanel.vue'
+import { ref, onMounted } from 'vue'
+import StarBackground from '@/components/common/StarBackground.vue'
 
-const activeTab = ref('journal')
-const isDarkMode = ref(false)
+const isDarkMode = ref(true)
 
 const navItems = [
-  { name: '每日记录', id: 'journal', icon: 'ph-notebook' },
-  { name: '树洞话题', id: 'treehole', icon: 'ph-tree-evergreen' },
-  { name: '关于我', id: 'about', icon: 'ph-smiley' }
+  { name: '仪表盘', path: '/', icon: 'ph-squares-four' },
+  // { name: '日志', path: '/journal', icon: 'ph-notebook' }, // 已移除
 ]
 
-const activeComponent = computed(() => {
-  switch (activeTab.value) {
-    case 'journal': return JournalList
-    case 'treehole': return TreeHolePanel
-    default: return JournalList
-  }
-})
+const setTheme = (isDark: boolean) => {
+  isDarkMode.value = isDark
+  updateTheme()
+  localStorage.setItem('theme', isDark ? 'dark' : 'light')
+}
 
-const getCurrentPageName = computed(() => {
-  return navItems.find(item => item.id === activeTab.value)?.name || '未知'
-})
-
-// 切换主题
-const toggleTheme = () => {
-  isDarkMode.value = !isDarkMode.value
+const updateTheme = () => {
   if (isDarkMode.value) {
     document.documentElement.classList.add('dark')
   } else {
@@ -141,43 +121,54 @@ const toggleTheme = () => {
   }
 }
 
-// 模拟侧边栏开关
 const toggleSidebar = () => {
-  alert('移动端侧边栏展开 (模拟)')
+  alert('移动端导航暂未实现')
 }
 
-// 初始化检查系统主题
 onMounted(() => {
-  if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+  const savedTheme = localStorage.getItem('theme')
+  if (savedTheme) {
+    isDarkMode.value = savedTheme === 'dark'
+  } else {
+    // 默认暗色
     isDarkMode.value = true
-    document.documentElement.classList.add('dark')
   }
+  updateTheme()
 })
 </script>
 
 <style scoped>
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
-  transform: translateY(5px);
+  transform: translateY(10px);
 }
 
-/* 图标旋转动画 */
-.rotate-enter-active,
-.rotate-leave-active {
-  transition: all 0.3s ease;
+.animate-pulse-slow {
+  animation: pulse 8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
-.rotate-enter-from {
-  opacity: 0;
-  transform: rotate(-90deg) scale(0.5);
+
+.animate-scan {
+  animation: scan 2s linear infinite;
 }
-.rotate-leave-to {
-  opacity: 0;
-  transform: rotate(90deg) scale(0.5);
+
+@keyframes scan {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(200%); }
+}
+
+.glitch-effect {
+  position: relative;
+}
+
+.bg-grid-pattern {
+  background-image: linear-gradient(currentColor 1px, transparent 1px),
+    linear-gradient(90deg, currentColor 1px, transparent 1px);
+  background-size: 30px 30px;
 }
 </style>
