@@ -40,7 +40,7 @@ export const usePostsStore = defineStore('posts', () => {
     const newPost: Post = {
       ...post,
       id: crypto.randomUUID(),
-      createdAt: new Date().toISOString().split('T')[0],
+      createdAt: new Date().toISOString().substring(0, 10),
       views: 0
     }
     posts.value.unshift(newPost)
