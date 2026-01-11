@@ -89,10 +89,10 @@ const getTypeIcon = (type: LifeLog['type']) => {
 
 const getTypeLabel = (type: LifeLog['type']) => {
   const labels = {
-    work: 'Work Flow',
-    life: 'Daily Life',
-    study: 'Learning',
-    thought: 'Thinking'
+    work: '工作流',
+    life: '生活',
+    study: '学习',
+    thought: '思考'
   }
   return labels[type]
 }

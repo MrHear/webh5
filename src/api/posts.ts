@@ -18,6 +18,7 @@ export interface GetPostsParams {
   page?: number
   limit?: number
   type?: PostType
+  keyword?: string // 搜索关键词
 }
 
 /**

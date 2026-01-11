@@ -9,6 +9,20 @@
         </h2>
       </div>
       
+      <!-- 搜索框 -->
+      <div class="w-full max-w-2xl relative group z-10">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <i class="ph ph-magnifying-glass text-slate-400 group-focus-within:text-indigo-500 transition-colors"></i>
+        </div>
+        <input 
+          v-model="searchKeyword"
+          @keydown.enter="handleSearch"
+          type="text" 
+          placeholder="搜索记忆..." 
+          class="w-full bg-slate-50 dark:bg-white/5 border border-transparent focus:border-indigo-100 dark:focus:border-indigo-900/50 rounded-xl py-3 pl-10 pr-4 text-sm text-slate-700 dark:text-slate-200 outline-none transition-all shadow-sm focus:shadow-md focus:bg-white dark:focus:bg-[#1a1a1c]"
+        >
+      </div>
+      
       <!-- 快速开始卡片 -->
       <button 
         @click="router.push('/editor')"
@@ -26,7 +40,7 @@
     <!-- 内容流：时间轴样式 -->
     <section class="max-w-2xl">
       <div class="flex items-center justify-between mb-8 pb-2 border-b border-gray-100 dark:border-white/5">
-        <span class="text-xs font-bold tracking-widest text-slate-400 uppercase">Recent</span>
+        <span class="text-xs font-bold tracking-widest text-slate-400 uppercase">Timeline</span>
         <!-- 简单的过滤器 -->
         <div class="flex gap-4">
            <button 
@@ -144,9 +158,19 @@ const postsStore = usePostsStore()
 
 const currentFilter = ref<PostType | undefined>(undefined)
 
+const searchKeyword = ref('')
+
 // 加载文章
 const loadPosts = () => {
-  postsStore.fetchPosts({ type: currentFilter.value })
+  postsStore.fetchPosts({ 
+    type: currentFilter.value,
+    keyword: searchKeyword.value
+  })
+}
+
+// 搜索
+const handleSearch = () => {
+  loadPosts()
 }
 
 // 过滤切换

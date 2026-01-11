@@ -120,6 +120,9 @@
         ></div>
       </div>
     </GlassCard>
+
+    <!-- 评论区 -->
+    <CommentSection :postId="post.id" />
   </div>
 
   <!-- 文章未找到 -->
@@ -139,6 +142,7 @@ import { usePostsStore } from '@/stores/posts'
 import { useAuthStore } from '@/stores/auth'
 import GlassCard from '@/components/common/GlassCard.vue'
 import LoginModal from '@/components/common/LoginModal.vue'
+import CommentSection from '@/components/common/CommentSection.vue'
 import { MdPreview } from 'md-editor-v3'
 import 'md-editor-v3/lib/style.css'
 import type { PostDetail } from '@/types/api'
