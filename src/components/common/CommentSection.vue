@@ -155,7 +155,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick, computed } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import { commentApi } from '@/api/comments'
 import type { Comment } from '@/types/comment'
 
