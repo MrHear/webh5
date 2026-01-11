@@ -1,9 +1,8 @@
 <template>
   <div 
-    class="relative bg-white dark:bg-[#1a1a1c] rounded-xl border border-gray-100 dark:border-white/5 p-6 transition-all duration-300"
+    class="relative bg-white/70 dark:bg-[#1a1a1c]/70 backdrop-blur-xl rounded-xl border border-white/20 dark:border-white/5 p-6 transition-all duration-300 shadow-sm"
     :class="{ 
-      'cursor-pointer hover:shadow-md hover:border-indigo-100/50 dark:hover:border-white/10': hoverable,
-      'shadow-[0_2px_8px_rgba(0,0,0,0.02)]': true
+      'cursor-pointer hover:shadow-lg hover:bg-white/80 dark:hover:bg-[#1a1a1c]/80 hover:-translate-y-1': hoverable
     }"
   >
     <slot />

@@ -29,12 +29,50 @@
         <span class="text-xs font-bold tracking-widest text-slate-400 uppercase">Recent</span>
         <!-- 简单的过滤器 -->
         <div class="flex gap-4">
-           <button class="text-xs font-medium text-slate-800 dark:text-white">All</button>
-           <button class="text-xs font-medium text-slate-400 hover:text-slate-600">Drafts</button>
+           <button 
+             @click="handleFilter(undefined)"
+             class="text-xs font-medium transition-colors"
+             :class="currentFilter === undefined ? 'text-slate-800 dark:text-white' : 'text-slate-400 hover:text-slate-600'"
+           >
+             All
+           </button>
+           <button 
+             @click="handleFilter('markdown')"
+             class="text-xs font-medium transition-colors"
+             :class="currentFilter === 'markdown' ? 'text-slate-800 dark:text-white' : 'text-slate-400 hover:text-slate-600'"
+           >
+             Markdown
+           </button>
+           <button 
+             @click="handleFilter('richtext')"
+             class="text-xs font-medium transition-colors"
+             :class="currentFilter === 'richtext' ? 'text-slate-800 dark:text-white' : 'text-slate-400 hover:text-slate-600'"
+           >
+             富文本
+           </button>
         </div>
       </div>
 
-      <div class="space-y-6">
+      <!-- 加载状态 -->
+      <div v-if="postsStore.loading" class="py-20 text-center">
+        <div class="inline-block w-8 h-8 border-2 border-slate-200 border-t-indigo-500 rounded-full animate-spin"></div>
+        <p class="text-slate-400 mt-4">加载中...</p>
+      </div>
+
+      <!-- 错误状态 -->
+      <div v-else-if="postsStore.error" class="py-20 text-center">
+        <i class="ph ph-warning-circle text-4xl text-red-400 mb-4 block"></i>
+        <p class="text-slate-500">{{ postsStore.error }}</p>
+        <button 
+          @click="loadPosts"
+          class="mt-4 text-indigo-500 hover:text-indigo-600 text-sm"
+        >
+          重新加载
+        </button>
+      </div>
+
+      <!-- 文章列表 -->
+      <div v-else class="space-y-6">
         <div 
           v-for="post in postsStore.posts" 
           :key="post.id"
@@ -48,12 +86,15 @@
             @click="router.push(`/post/${post.id}`)"
           >
             <div class="flex items-center gap-3 mb-1">
-              <span class="text-xs font-mono text-slate-400">{{ post.createdAt }}</span>
+              <span class="text-xs font-mono text-slate-400">{{ formatDate(post.createdAt) }}</span>
               <span 
                 class="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700"
               ></span>
               <span class="text-[10px] tracking-wide uppercase text-slate-400 border border-slate-100 dark:border-white/5 px-1.5 py-0.5 rounded">
                 {{ post.type === 'markdown' ? 'MD' : 'RT' }}
+              </span>
+              <span class="text-[10px] text-slate-400 flex items-center gap-1">
+                <i class="ph ph-eye"></i> {{ post.views }}
               </span>
             </div>
 
@@ -61,25 +102,81 @@
               {{ post.title }}
             </h3>
             
-            <p class="text-sm text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed opacity-80 group-hover:opacity-100">
-              {{ post.summary }}
+            <p class="text-sm text-slate-500/80 dark:text-slate-400/80 line-clamp-2 leading-relaxed font-light">
+              {{ cleanSummary(post.summary) }}
             </p>
+
+            <!-- 标签 -->
+            <div v-if="post.tags && post.tags.length > 0" class="flex gap-2 mt-2">
+              <span 
+                v-for="tag in post.tags" 
+                :key="tag"
+                class="text-[10px] text-slate-400 bg-slate-50 dark:bg-white/5 px-2 py-0.5 rounded"
+              >
+                #{{ tag }}
+              </span>
+            </div>
           </div>
         </div>
       </div>
 
       <!-- 如果没有内容 -->
-      <div v-if="postsStore.posts.length === 0" class="py-20 text-center">
+      <div v-if="!postsStore.loading && !postsStore.error && postsStore.posts.length === 0" class="py-20 text-center">
         <p class="text-slate-400 italic font-serif">一片荒原。</p>
+      </div>
+
+      <!-- 分页信息 -->
+      <div v-if="postsStore.total > 0" class="mt-8 text-center text-xs text-slate-400">
+        共 {{ postsStore.total }} 篇文章
       </div>
     </section>
   </div>
 </template>
 
 <script setup lang="ts">
+import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { usePostsStore } from '@/stores/posts'
+import type { PostType } from '@/types/api'
 
 const router = useRouter()
 const postsStore = usePostsStore()
+
+const currentFilter = ref<PostType | undefined>(undefined)
+
+// 加载文章
+const loadPosts = () => {
+  postsStore.fetchPosts({ type: currentFilter.value })
+}
+
+// 过滤切换
+const handleFilter = (type: PostType | undefined) => {
+  currentFilter.value = type
+  loadPosts()
+}
+
+// 格式化日期
+const formatDate = (dateStr: string) => {
+  if (!dateStr) return ''
+  // 处理 ISO 格式日期
+  const date = new Date(dateStr)
+  if (isNaN(date.getTime())) return dateStr
+  return date.toISOString().substring(0, 10)
+}
+
+// 清洗摘要显示
+const cleanSummary = (summary: string) => {
+  if (!summary) return ''
+  // 移除所有 Markdown 表格符号和分隔符
+  let cleaned = summary.replace(/[|]/g, ' ')
+  cleaned = cleaned.replace(/-{2,}/g, ' ')
+  // 移除可能的其他符号
+  cleaned = cleaned.replace(/\s+/g, ' ').trim()
+  return cleaned || '暂无摘要'
+}
+
+// 页面加载时获取数据
+onMounted(() => {
+  loadPosts()
+})
 </script>

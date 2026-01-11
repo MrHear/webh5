@@ -52,11 +52,7 @@
       <main class="flex-1 min-h-screen relative z-10 flex flex-col">
         <!-- 路由视图 -->
         <div class="flex-1 w-full mx-auto p-6 md:p-12 max-w-5xl">
-          <router-view v-slot="{ Component }">
-            <Transition name="fade" mode="out-in">
-              <component :is="Component" />
-            </Transition>
-          </router-view>
+          <router-view></router-view>
         </div>
       </main>
     </div>
