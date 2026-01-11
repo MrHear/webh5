@@ -85,6 +85,17 @@
                 <i class="ph ph-arrow-u-up-left"></i>
                 <span>回复</span>
               </button>
+
+              <!-- 删除按钮 (管理员可见) -->
+              <button 
+                v-if="authStore.isLoggedIn"
+                @click="handleDelete(comment)"
+                class="flex items-center gap-1.5 text-xs text-slate-400 hover:text-red-500 transition-colors"
+                :disabled="deletingId === comment.id"
+              >
+                <i :class="deletingId === comment.id ? 'ph ph-spinner animate-spin' : 'ph ph-trash'"></i>
+                <span>删除</span>
+              </button>
             </div>
           </div>
         </div>
@@ -157,8 +168,10 @@
 <script setup lang="ts">
 import { ref, onMounted, nextTick } from 'vue'
 import { commentApi } from '@/api/comments'
+import { useAuthStore } from '@/stores/auth'
 import type { Comment } from '@/types/comment'
 
+const authStore = useAuthStore()
 const STORAGE_AUTHOR_KEY = 'mindspace_comment_author'
 
 const props = defineProps<{
@@ -168,6 +181,7 @@ const props = defineProps<{
 const comments = ref<Comment[]>([])
 const loading = ref(true)
 const submitting = ref(false)
+const deletingId = ref<string | null>(null)
 const isInputFocused = ref(false)
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
 const currentSort = ref<'time' | 'likes'>('time')
@@ -272,6 +286,24 @@ const handleLike = async (comment: Comment) => {
     }
   } catch (e) {
     Object.assign(comment, originalState)
+  }
+}
+
+const handleDelete = async (comment: Comment) => {
+  if (!confirm('确定要删除这条评论吗？')) return
+  
+  deletingId.value = comment.id
+  try {
+    const res = await commentApi.deleteComment(comment.id)
+    if (res.code === 200) {
+      // 从列表中移除
+      comments.value = comments.value.filter(c => c.id !== comment.id)
+    }
+  } catch (error) {
+    console.error('Failed to delete comment:', error)
+    alert('删除失败，请重试')
+  } finally {
+    deletingId.value = null
   }
 }
 

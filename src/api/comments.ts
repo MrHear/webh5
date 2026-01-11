@@ -18,5 +18,10 @@ export const commentApi = {
   // 点赞评论
   likeComment(commentId: string) {
     return request.post<any, ApiResponse<{ isLiked: boolean, likes: number }>>(`/v1/comments/${commentId}/like`)
+  },
+
+  // 删除评论（管理员）
+  deleteComment(commentId: string) {
+    return request.delete<any, ApiResponse<null>>(`/v1/comments/${commentId}`)
   }
 }
